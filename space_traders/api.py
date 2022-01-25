@@ -49,7 +49,7 @@ class Client:
     def put(self, url_path, params: Optional[dict] = None):
         if params is None:
             params = {}
-        response = self.session.post(f'{BASE_URL}{url_path}', params={'token': self.token, **params})
+        response = self.session.put(f'{BASE_URL}{url_path}', params={'token': self.token, **params})
         return self._handle_request_response(response)
 
     def status(self):
