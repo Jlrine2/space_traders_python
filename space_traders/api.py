@@ -79,7 +79,7 @@ class Loans(Client):
 
     def pay_loan(self, loan_id):
         response = self.put(f'my/loans/{loan_id}')
-        loans = response.json()['loans']
+        loans = response['loans']
         return [models.get_loan(loan) for loan in loans]
 
 
