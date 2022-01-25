@@ -3,7 +3,7 @@ from typing import Optional
 
 import requests
 
-import models
+from space_traders import models
 
 BASE_URL = 'https://api.spacetraders.io/'
 
