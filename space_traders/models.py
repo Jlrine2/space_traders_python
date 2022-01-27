@@ -106,7 +106,7 @@ class Ship(BaseModel):
             type: str = None,
             weapons: int = None,
             loadingSpeed: int = None,
-            restrictedGoods: Mapping[str, str] = None,
+            restrictedGoods: list[str]= None,
             x: int = None,
             y: int = None,
     ):
@@ -124,9 +124,7 @@ class Ship(BaseModel):
             type=type,
             weapons=weapons,
             loadingSpeed=loadingSpeed,
-            restrictedGoods=[
-                Cargo(**restrictedGoods) for restrictedGoods in restrictedGoods
-            ] if restrictedGoods else None,
+            restrictedGoods=restrictedGoods,
             x=x,
             y=y,
         )
