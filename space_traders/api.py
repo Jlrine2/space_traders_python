@@ -104,7 +104,7 @@ class Ships(Client):
         return self._do_return(models.Ship, response['ships'])
 
     def refuel(self, ship, quantity):
-        params = {'shipId': ship.ship_id, 'good': 'FUEL', 'quantity': quantity}
+        params = {'shipId': ship.id, 'good': 'FUEL', 'quantity': quantity}
         response = self.post('my/purchase-orders', params=params)
         return self._do_return(models.Ship, response['ships'])
 
