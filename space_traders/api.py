@@ -132,7 +132,7 @@ class Ships(Client):
 
     def scrap(self, ship: models.Ship):
         params = {'shipId': ship.id}
-        response = self.delete(f'my/ships/{ship.id}/scrap', params=params)
+        response = self.delete(f'my/ships/{ship.id}', params=params)
         return response
 
     def transfer(self, from_ship: models.Ship, to_ship: models.Ship, good_symobol: str, quantity: int):
