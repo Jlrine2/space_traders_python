@@ -78,7 +78,7 @@ class Loans(Client):
 
     def take_loan(self, loan):
         response = self.post('my/loans', params={'type': loan.type})
-        return self._do_return(models.Loan, response['loans'])
+        return self._do_return(models.Loan, response['loan'])
 
     def my_loans(self):
         response = self.get('my/loans')
@@ -101,16 +101,16 @@ class Ships(Client):
     def purchase(self, listing: models.AvailableShip, location_symbol):
         params = {'location': location_symbol, 'type': listing.type}
         response = self.post('my/ships', params=params)
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.Ship, response['ship'])
 
     def refuel(self, ship, quantity):
         params = {'shipId': ship.id, 'good': 'FUEL', 'quantity': quantity}
         response = self.post('my/purchase-orders', params=params)
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.Ship, response['ship'])
 
     def view_ship(self, ship_id):
         response = self.get(f'my/ships/{ship_id}')
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.Ship, response['ship'])
 
     def view_all_ships(self):
         response = self.get('my/ships')
@@ -119,16 +119,16 @@ class Ships(Client):
     def create_flight_plan(self, ship: models.Ship, desination_symbol: models.Location):
         params = {'shipId': ship.id, 'destination': desination_symbol}
         response = self.post('my/flight-plans', params=params)
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.FlightPlan, response['flightPlan'])
 
     def view_flight_plan(self, flight_plan_id):
         response = self.get(f'my/flight-plans/{flight_plan_id}')
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.FlightPlan, response['flightPlan'])
 
     def jettison_cargo(self, ship: models.Ship, good_symobol: str, quantity: int):
         params = {'good': good_symobol, 'quantity': quantity}
         response = self.post(f'my/ships/{ship.id}/jettison', params=params)
-        return self._do_return(models.Ship, response['ships'])
+        return response
 
     def scrap(self, ship: models.Ship):
         params = {'shipId': ship.id}
@@ -138,7 +138,7 @@ class Ships(Client):
     def transfer(self, from_ship: models.Ship, to_ship: models.Ship, good_symobol: str, quantity: int):
         params = {'toShipId': to_ship.id, 'good': good_symobol, 'quantity': quantity}
         response = self.post(f'my/ships/{from_ship.id}/transfer', params=params)
-        return self._do_return(models.Ship, response['ships'])
+        return self._do_return(models.Ship, response['fromShip']), self._do_return(models.Ship, response['toShip'])
 
 
 class Location(Client):
@@ -147,11 +147,11 @@ class Location(Client):
 
     def view(self, location_symbol):
         response = self.get(f'locations/{location_symbol}')
-        return self._do_return(models.Location, response['locations'])
+        return self._do_return(models.Location, response['location'])
 
     def ships(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/ships')
-        return self._do_return(models.Location, response['locations'])
+        return self._do_return(models.Ship, response['ships'])
 
     def view_all_locations(self, system_symbol):
         response = self.get(f'systems/{system_symbol}/locations')
@@ -159,7 +159,7 @@ class Location(Client):
 
     def marketplace(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/marketplace')
-        return self._do_return(models.Location, response['locations'])
+        return self._do_return(models.Market, response['marketplace'])
 
 
 class Structures(Client):
@@ -174,11 +174,11 @@ class Structures(Client):
     def deposit(self, structure_id, ship_id, good_symbol: str, quantity: int):
         params = {'shipId': ship_id, 'good': good_symbol, 'quantity': quantity}
         response = self.post(f'my/structures/{structure_id}/deposit', params=params)
-        return self._do_return(models.Structure, response['structures'])
+        return self._do_return(models.Ship, response['ship']), self._do_return(models.Structure, response['structures'])
 
     def view(self, structure_id):
         response = self.get(f'my/structures/{structure_id}')
-        return self._do_return(models.Structure, response['structures'])
+        return self._do_return(models.Structure, response['structure'])
 
     def view_all(self):
         response = self.get('my/structures')
@@ -187,7 +187,7 @@ class Structures(Client):
     def transfer(self, structure_id, ship_id, good_symbol: str, quantity: int):
         params = {'shipId': ship_id, 'good': good_symbol, 'quantity': quantity}
         response = self.post(f'my/structures/{structure_id}/transfer', params=params)
-        return self._do_return(models.Structure, response['structures'])
+        return self._do_return(models.Structure, response['structures']), self._do_return(models.Ship, response['ship'])
 
 
 class Api(Client):
