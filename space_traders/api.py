@@ -60,11 +60,11 @@ class Client:
         return self._handle_request_response(response)
 
     def _do_return(self, model: Type[models.BaseModel], response: Union[dict, list]):
+        if isinstance(response, list):
+            return [self._do_return(model, item) for item in response]
         if 'class' in response:
             response['shipClass'] = response['class']
             del response['class']
-        if isinstance(response, list):
-            return [model(**item) for item in response]
         return model(**response)
 
 
