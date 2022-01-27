@@ -428,6 +428,6 @@ class Market(BaseModel):
             location: str = None,
     ):
         super().__init__(
-            goods=[MarketGood(**marketGood) for marketGood in goods],
+            goods=goods,
             location=location,
         )
