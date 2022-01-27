@@ -124,7 +124,9 @@ class Ship(BaseModel):
             type=type,
             weapons=weapons,
             loadingSpeed=loadingSpeed,
-            restrictedGoods=[Cargo(**restrictedGoods) for restrictedGoods in restrictedGoods],
+            restrictedGoods=[
+                Cargo(**restrictedGoods) for restrictedGoods in restrictedGoods
+            ] if restrictedGoods else None,
             x=x,
             y=y,
         )
