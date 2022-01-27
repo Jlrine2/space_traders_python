@@ -11,6 +11,12 @@ class BaseModel:
 
 
 class User(BaseModel):
+    credits: int = None
+    joinedAt: str = None
+    shipCount: int = None
+    structureCount: int = None
+    username: str = None
+
     def __init__(
             self,
             credits: int = None,
@@ -29,6 +35,18 @@ class User(BaseModel):
 
 
 class FlightPlan(BaseModel):
+    arriveAt: str = None
+    createdAt: str = None
+    departure: str = None
+    destination: str = None
+    distance: int = None
+    fuelConsumed: int = None
+    fuelRemaining: int = None
+    id: str = None
+    shipId: str = None
+    terminatedAt: str = None
+    timeRemainingInSeconds: int = None
+
     def __init__(
             self,
             arrivesAt: str = None,
@@ -59,6 +77,12 @@ class FlightPlan(BaseModel):
 
 
 class Loan(BaseModel):
+    due: str = None
+    id: str = None
+    repaymentAmount: int = None
+    status: str = None
+    type: str = None
+
     def __init__(
             self,
             due: str = None,
@@ -77,6 +101,10 @@ class Loan(BaseModel):
 
 
 class Cargo(BaseModel):
+    good: str = None
+    quantity: int = None
+    totalVolume: int = None
+
     def __init__(
             self,
             good: str = None,
@@ -91,6 +119,23 @@ class Cargo(BaseModel):
 
 
 class Ship(BaseModel):
+    cargo: List[Mapping[str, str]] = None
+    shipClass: str = None
+    flightPlanId: str = None
+    id: str = None
+    location: str = None
+    manufacturer: str = None
+    maxCargo: int = None
+    plating: int = None
+    spaceAvailable: int = None
+    speed: int = None
+    type: str = None
+    weapons: int = None
+    loadingSpeed: int = None
+    restrictedGoods: list[str] = None
+    x: int = None
+    y: int = None
+
     def __init__(
             self,
             cargo: List[Mapping[str, str]] = None,
@@ -131,6 +176,8 @@ class Ship(BaseModel):
 
 
 class Item(BaseModel):
+    good: str = None
+    quantity: int = None
     def __init__(
             self,
             good: str = None,
@@ -143,6 +190,15 @@ class Item(BaseModel):
 
 
 class Structure(BaseModel):
+    active: bool = None
+    consumes: List[str] = None,
+    id: str = None,
+    inventory: List[Item] = None,
+    location: str = None,
+    ownedBy: Mapping[str, str] = None,
+    produces: List[str] = None,
+    status: str = None,
+    type: str = None,
     def __init__(
             self,
             active: bool = None,
@@ -169,6 +225,14 @@ class Structure(BaseModel):
 
 
 class Location(BaseModel):
+    allowsConstruction: bool = None
+    dockedShips: int = None
+    name: str = None
+    symbol: str = None
+    type: str = None
+    x: int = None
+    y: int = None
+
     def __init__(
             self,
             allowsConstruction: bool = None,
@@ -191,6 +255,9 @@ class Location(BaseModel):
 
 
 class System(BaseModel):
+    symbol: str = None
+    name: str = None
+
     def __init__(
             self,
             symbol: str = None,
@@ -203,6 +270,10 @@ class System(BaseModel):
 
 
 class AvailableGood(BaseModel):
+    name: str = None
+    symbol: str = None
+    volumePerUnit: int = None
+
     def __init__(
             self,
             name: str = None,
@@ -217,6 +288,12 @@ class AvailableGood(BaseModel):
 
 
 class AvailableLoan(BaseModel):
+    amount: int = None
+    collateralRequired: int = None
+    rate: 40 = None
+    termInDays: int = None
+    type: str = None
+
     def __init__(
             self,
             amount: int = None,
@@ -235,6 +312,13 @@ class AvailableLoan(BaseModel):
 
 
 class AvailableStructures(BaseModel):
+    allowedLocationTypes: List[str] = None
+    consumes: List[str] = None
+    name: str = None
+    price: int = None
+    produces: List[str] = None
+    type: str = None
+
     def __init__(
             self,
             allowedLocationTypes: List[str] = None,
@@ -255,6 +339,10 @@ class AvailableStructures(BaseModel):
 
 
 class PurchaseLocation(BaseModel):
+    location: str = None
+    price: int = None
+    system: str = None
+
     def __init__(
             self,
             location: str = None,
@@ -269,6 +357,15 @@ class PurchaseLocation(BaseModel):
 
 
 class AvailableShip(BaseModel):
+    shipClass: str = None
+    manufacturer: str = None
+    maxCargo: int = None
+    plating: int = None
+    speed: int = None
+    type: str = None
+    weapons: int = None
+    purchaseLocations: List[PurchaseLocation] = None
+
     def __init__(
             self,
             shipClass: str = None,
@@ -293,6 +390,14 @@ class AvailableShip(BaseModel):
 
 
 class MarketGood(BaseModel):
+    pricePerUnit: int = None
+    purchasePricePerUnit: int = None
+    quantityAvailable: int = None
+    sellPricePerUnit: int = None
+    spread: int = None
+    symbol: str = None
+    volumePerUnit: int = None
+
     def __init__(
             self,
             pricePerUnit: int = None,
@@ -315,6 +420,9 @@ class MarketGood(BaseModel):
 
 
 class Market(BaseModel):
+    goods: List[MarketGood] = None
+    location: str = None
+
     def __init__(
             self,
             goods: List[MarketGood] = None,
