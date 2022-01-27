@@ -422,7 +422,6 @@ class MarketGood(BaseModel):
 class Market(BaseModel):
     goods: List[MarketGood] = None
     location: str = None
-
     def __init__(
             self,
             goods: List[MarketGood] = None,

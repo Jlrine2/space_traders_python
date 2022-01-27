@@ -159,7 +159,7 @@ class Location(Client):
 
     def marketplace(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/marketplace')
-        return self._do_return(models.Market, response['marketplace'])
+        return models.Market(goods=self._do_return(models.MarketGood, response['marketplace']), location=location_symbol)
 
 
 class Structures(Client):
