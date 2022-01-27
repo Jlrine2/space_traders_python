@@ -1,5 +1,5 @@
 import time
-from typing import Optional
+from typing import Optional, Type, Union
 
 import requests
 
@@ -59,6 +59,14 @@ class Client:
         response = self.session.delete(f'{BASE_URL}{url_path}', params={'token': self.token, **params})
         return self._handle_request_response(response)
 
+    def _do_return(self, model: Type[models.BaseModel], response: Union[dict, list]):
+        if 'class' in response:
+            response['shipClass'] = response['class']
+            del response['class']
+        if isinstance(response, list):
+            return [model(**item) for item in response]
+        return model(**response)
+
 
 class Loans(Client):
     def __init__(self, token):
@@ -66,20 +74,20 @@ class Loans(Client):
 
     def available_loans(self):
         response = self.get('types/loans')
-        return [models.Loan(loan) for loan in response['loans']]
+        return self._do_return(models.Loan, response['loans'])
 
     def take_loan(self, loan):
         response = self.post('my/loans', params={'type': loan.type})
-        return models.Loan(response['loan'])
+        return self._do_return(models.Loan, response['loans'])
 
     def my_loans(self):
         response = self.get('my/loans')
-        return [models.Loan(loan) for loan in response['loans']]
+        return self._do_return(models.Loan, response['loans'])
 
     def pay_loan(self, loan_id):
         response = self.put(f'my/loans/{loan_id}')
         loans = response['loans']
-        return [models.Loan(loan) for loan in loans]
+        return self._do_return(models.Loan, response['loans'])
 
 
 class Ships(Client):
@@ -88,39 +96,39 @@ class Ships(Client):
 
     def available_ships(self, system_symbol, ship_class: str):
         response = self.get(f'systems/{system_symbol}/ship-listings', params={'class': ship_class})
-        return [models.AvailableShip.from_api_response(ship) for ship in response['shipListings']]
+        return self._do_return(models.Ship, response['ships'])
 
     def purchase(self, listing: models.AvailableShip, location_symbol):
         params = {'location': location_symbol, 'type': listing.type}
         response = self.post('my/ships', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ships'])
 
     def refuel(self, ship, quantity):
         params = {'shipId': ship.ship_id, 'good': 'FUEL', 'quantity': quantity}
         response = self.post('my/purchase-orders', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ships'])
 
     def view_ship(self, ship_id):
         response = self.get(f'my/ships/{ship_id}')
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ships'])
 
     def view_all_ships(self):
         response = self.get('my/ships')
-        return [models.Ship.from_api_response(ship) for ship in response['ships']]
+        return self._do_return(models.Ship, response['ships'])
 
     def create_flight_plan(self, ship: models.Ship, desination_symbol: models.Location):
         params = {'shipId': ship.id, 'destination': desination_symbol}
         response = self.post('my/flight-plans', params=params)
-        return models.FlightPlan(response['flightPlan'])
+        return self._do_return(models.Ship, response['ships'])
 
     def view_flight_plan(self, flight_plan_id):
         response = self.get(f'my/flight-plans/{flight_plan_id}')
-        return models.FlightPlan(response['flightPlan'])
+        return self._do_return(models.Ship, response['ships'])
 
     def jettison_cargo(self, ship: models.Ship, good_symobol: str, quantity: int):
         params = {'good': good_symobol, 'quantity': quantity}
         response = self.post(f'my/ships/{ship.id}/jettison', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ships'])
 
     def scrap(self, ship: models.Ship):
         params = {'shipId': ship.id}
@@ -130,7 +138,7 @@ class Ships(Client):
     def transfer(self, from_ship: models.Ship, to_ship: models.Ship, good_symobol: str, quantity: int):
         params = {'toShipId': to_ship.id, 'good': good_symobol, 'quantity': quantity}
         response = self.post(f'my/ships/{from_ship.id}/transfer', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ships'])
 
 
 class Location(Client):
@@ -139,19 +147,19 @@ class Location(Client):
 
     def view(self, location_symbol):
         response = self.get(f'locations/{location_symbol}')
-        return models.Location(response['location'])
+        return self._do_return(models.Location, response['locations'])
 
     def ships(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/ships')
-        return [models.Ship.from_api_response(ship) for ship in response['ships']]
+        return self._do_return(models.Location, response['locations'])
 
     def view_all_locations(self, system_symbol):
         response = self.get(f'systems/{system_symbol}/locations')
-        return [models.Location(location) for location in response['locations']]
+        return self._do_return(models.Location, response['locations'])
 
     def marketplace(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/marketplace')
-        return models.Market(response['marketplace'])
+        return self._do_return(models.Location, response['locations'])
 
 
 class Structures(Client):
@@ -161,25 +169,25 @@ class Structures(Client):
     def create(self, location_symbol, structure_type: str):
         params = {'type': structure_type, 'location': location_symbol}
         response = self.post('my/structures', params=params)
-        return models.Structure(response['structure'])
+        return self._do_return(models.Structure, response['structures'])
 
     def deposit(self, structure_id, ship_id, good_symbol: str, quantity: int):
         params = {'shipId': ship_id, 'good': good_symbol, 'quantity': quantity}
         response = self.post(f'my/structures/{structure_id}/deposit', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Structure, response['structures'])
 
     def view(self, structure_id):
         response = self.get(f'my/structures/{structure_id}')
-        return models.Structure(response['structure'])
+        return self._do_return(models.Structure, response['structures'])
 
     def view_all(self):
         response = self.get('my/structures')
-        return [models.Structure(structure) for structure in response['structures']]
+        return self._do_return(models.Structure, response['structures'])
 
     def transfer(self, structure_id, ship_id, good_symbol: str, quantity: int):
         params = {'shipId': ship_id, 'good': good_symbol, 'quantity': quantity}
         response = self.post(f'my/structures/{structure_id}/transfer', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Structure, response['structures'])
 
 
 class Api(Client):
@@ -192,16 +200,16 @@ class Api(Client):
     def purchase(self, ship: models.Ship, good: models.MarketGood, quantity: int):
         params = {'shipId': ship.id, 'good': good.symbol, 'quantity': quantity}
         response = self.post('my/purchase-orders', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ship'])
 
     def sell(self, ship: models.Ship, cargo: models.Cargo, quantity: int):
         params = {'shipId': ship.id, 'good': cargo.good, 'quantity': quantity}
         response = self.post('my/sell-orders', params=params)
-        return models.Ship.from_api_response(response['ship'])
+        return self._do_return(models.Ship, response['ship'])
 
     def all_systems(self):
         response = self.get('game/systems')
-        return [models.System(system) for system in response['systems']]
+        return self._do_return(models.System, response['systems'])
 
     def status(self):
         response = self.get('games/status')
@@ -209,4 +217,4 @@ class Api(Client):
 
     def info(self):
         response = self.get('my/account')
-        return models.User(response['user'])
+        return self._do_return(models.User, response['user'])
