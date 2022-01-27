@@ -145,6 +145,10 @@ class Location(Client):
         response = self.get(f'locations/{location_symbol}/ships')
         return [models.Ship.from_api_response(ship) for ship in response['ships']]
 
+    def view_all_locations(self, system_symbol):
+        response = self.get(f'systems/{system_symbol}/locations')
+        return [models.Location(location) for location in response['locations']]
+
     def marketplace(self, location_symbol):
         response = self.get(f'locations/{location_symbol}/marketplace')
         return models.Market(response['marketplace'])
